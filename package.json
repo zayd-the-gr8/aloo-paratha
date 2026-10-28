@@ -1,7 +1,7 @@
 {
-  "name": "scramjet-railway-backend",
-  "version": "1.0.0",
-  "description": "Backend engine for Chrome Proxy",
+  "name": "scramjet-proxy-engine",
+  "version": "1.1.0",
+  "description": "Cardless backend proxy server layer",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
