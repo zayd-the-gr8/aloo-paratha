@@ -6,26 +6,27 @@ const Scramjet = require('@titaniumnetwork-dev/scramjet');
 const app = express();
 const server = createServer(app);
 
-// Enable CORS so your frontend hosted on GitHub can communicate with Railway
+// Relax CORS restrictions to let your GitHub Pages UI query the proxy safely
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*', 
+    origin: '*', 
     credentials: true
 }));
 
-// Initialize Scramjet middleware
+// Initialize the proxy core middleware routing configurations
 const proxy = new Scramjet({
     prefix: '/service/',
     config: {
-        codec: 'xor', // Obfuscates traffic to bypass strict network filters
+        codec: 'xor' // Encodes destination endpoints to bypass perimeter network blocks
     }
 });
 
 app.use(proxy.express());
 
-// Fallback route for diagnostic checking
-app.get('/health', (req, res) => res.status(200).json({ status: 'Proxy active' }));
+// Simple live health ping route
+app.get('/proxy-status', (req, res) => res.status(200).json({ active: true, engine: 'Scramjet' }));
 
-const PORT = process.env.PORT || 8080;
+// Bonto automatically maps the listening container port dynamically via process.env.PORT
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Scramjet Engine deployed on port ${PORT}`);
+    console.log(`🚀 Proxy engine live and listening on port ${PORT}`);
 });
