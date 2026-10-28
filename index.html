@@ -3,204 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome - Web Browser</title>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>alo0</title>
     <style>
-        :root {
-            --bg-dark: #202124;
-            --tab-inactive: #2f3033;
-            --tab-active: #202124;
-            --border-color: #3c4043;
-            --text-main: #e8eaed;
-            --text-dim: #9aa0a6;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; flex-direction: column; height: 100vh; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
-
-
-        .window-header { background: var(--tab-inactive); padding-top: 8px; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { display: flex; flex-direction: column; height: 100vh; background: #202124; color: white; overflow: hidden; }
         
-        .tab-strip { display: flex; align-items: flex-end; padding-left: 8px; gap: 2px; overflow-x: auto; scrollbar-width: none; }
-        .tab-strip::-webkit-scrollbar { display: none; }
 
-        /* Modern Chrome Shape Tab */
+        .tab-bar { display: flex; align-items: flex-end; background: #2f3033; padding: 8px 8px 0 8px; gap: 4px; }
         .tab { 
-            display: flex; align-items: center; background: transparent; padding: 8px 16px; 
-            min-width: 140px; max-width: 200px; height: 36px; border-radius: 8px 8px 0 0;
-            cursor: pointer; position: relative; font-size: 12px; color: var(--text-dim);
-            transition: background 0.15s ease, color 0.15s ease;
-            animation: tabSpawn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
+            display: flex; align-items: center; background: #35363a; padding: 8px 16px; 
+            border-radius: 8px 8px 0 0; min-width: 120px; max-width: 200px; 
+            cursor: pointer; transition: all 0.2s ease; position: relative; animation: slideIn 0.2s ease;
         }
-        .tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
-        .tab.active { background: var(--tab-active); color: var(--text-main); font-weight: 500; }
-        
-        .tab-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
-        .tab-close { 
-            display: flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%; font-size: 11px;
-            transition: background 0.1s;
-        }
-        .tab-close:hover { background: rgba(255, 255, 255, 0.15); color: #ff5f56; }
+        .tab.active { background: #202124; }
+        .tab .close-btn { margin-left: auto; cursor: pointer; opacity: 0.6; font-size: 12px; }
+        .tab .close-btn:hover { opacity: 1; }
+        .add-tab-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 4px 12px; margin-bottom: 4px; }
 
-        .btn-add-tab { 
-            background: transparent; border: none; color: var(--text-dim); 
-            width: 28px; height: 28px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer;
-            margin-bottom: 4px; margin-left: 4px; transition: background 0.1s;
-        }
-        .btn-add-tab:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+        /* Navigation Bar */
+        .nav-bar { display: flex; background: #202124; padding: 8px; gap: 8px; align-items: center; border-bottom: 1px solid #3c4043; }
+        .address-bar { flex: 1; padding: 6px 12px; border-radius: 20px; border: none; background: #2f3033; color: white; outline: none; }
 
-        /* Chrome Navigation Bar */
-        .nav-bar { display: flex; background: var(--tab-active); padding: 6px 12px; gap: 12px; align-items: center; border-bottom: 1px solid var(--border-color); }
-        .nav-actions { display: flex; gap: 8px; color: var(--text-dim); }
-        .nav-icon { cursor: pointer; font-size: 20px; transition: color 0.1s; user-select: none; }
-        .nav-icon:hover { color: var(--text-main); }
-        .nav-icon.disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* Unified Smart OmniBox */
-        .omnibox-wrapper { flex: 1; display: flex; align-items: center; background: #2f3033; border-radius: 30px; padding: 4px 14px; gap: 8px; border: 2px solid transparent; transition: border 0.1s, background 0.1s; }
-        .omnibox-wrapper:focus-within { border-color: #8ab4f8; background: #202124; }
-        .omnibox-wrapper span { color: var(--text-dim); font-size: 18px; }
-        .omnibox { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 14px; outline: none; }
-
-        /* Sandbox Frame Context */
-        .viewport-space { flex: 1; position: relative; background: #fff; }
-        iframe { width: 100%; height: 100%; border: none; display: none; background: #fff; }
+        /* Viewport Container */
+        .container { flex: 1; position: relative; background: white; }
+        iframe { width: 100%; height: 100%; border: none; display: none; }
         iframe.active { display: block; }
 
         /* Animations */
-        @keyframes tabSpawn {
-            from { transform: scaleX(0.6) translateY(5px); opacity:0; }
-            to { transform: scaleX(1) translateY(0); opacity: 1; }
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-<link href='https://fonts.googleapis.com/css?family=Bitcount Grid Single' rel='stylesheet'>
-    <div class="window-header">
-        <div class="tab-strip" id="tabStrip">
-            <button class="btn-add-tab" onclick="createNewTab()">
-                <span class="material-icons-round" style="font-size: 18px;">add</span>
-            </button>
-        </div>
-        
-        <div class="nav-bar">
-            <div class="nav-actions">
-                <span class="material-icons-round nav-icon" onclick="navigateFrame('back')">arrow_back</span>
-                <span class="material-icons-round nav-icon" onclick="navigateFrame('forward')">arrow_forward</span>
-                <span class="material-icons-round nav-icon" onclick="navigateFrame('reload')">refresh</span>
-            </div>
-            <div class="omnibox-wrapper">
-                <span class="material-icons-round">lock_open</span>
-                <input type="text" class="omnibox" id="omnibox" placeholder="Search Google or enter an address URL" onkeydown="processOmniRequest(event)">
-            </div>
-        </div>
+
+    <div class="tab-bar" id="tabBar">
+        <button class="add-tab-btn" onclick="createNewTab()">+</button>
     </div>
 
-    <div class="viewport-space" id="viewportSpace"></div>
+    <div class="nav-bar">
+        <input type="text" class="address-bar" id="addressBar" placeholder="Search Google or type a URL" onkeydown="handleSearch(event)">
+    </div>
+
+    <div class="container" id="iframeContainer"></div>
 
     <script>
-        // REPLACE WITH LIVE RAILWAY APP DOMAIN HOST URL
-        const RAILWAY_PROXY_URL = "https://railway.app"; 
-        
-        let sessionTabs = [];
-        let currentActiveId = null;
-
-        // XOR Encoding/Decoding helper functions matching standard Scramjet configuration setup
-        const ScramjetCodec = {
-            encode(str) {
-                if (!str) return '';
-                return encodeURIComponent(str.split('').map((char, i) => i % 2 ? String.fromCharCode(char.charCodeAt(0) ^ 2) : char).join(''));
-            },
-            decode(str) {
-                if (!str) return '';
-                let [input, ...search] = str.split('?');
-                return decodeURIComponent(input).split('').map((char, i) => i % 2 ? String.fromCharCode(char.charCodeAt(0) ^ 2) : char).join('') + (search.length ? '?' + search.join('?') : '');
-            }
-        };
+        const PROXY_BACKEND = "https://your-scramjet-backend.com"; // Replace with your backend URL
+        let tabCount = 0;
+        let activeTabId = null;
 
         function createNewTab() {
-            const id = 'session_' + Math.random().toString(36).substring(2, 11);
+            tabCount++;
+            const tabId = `tab-${tabCount}`;
+
+            // Create Tab Element
+            const tab = document.createElement('div');
+            tab.className = 'tab';
+            tab.id = `nav-${tabId}`;
+            tab.innerHTML = `<span>New Tab</span> <span class="close-btn" onclick="closeTab(event, '${tabId}')">✕</span>`;
+            tab.onclick = () => switchTab(tabId);
             
-            // Build Structure Node
-            const tabNode = document.createElement('div');
-            tabNode.className = 'tab';
-            tabNode.id = `ui-${id}`;
-            tabNode.innerHTML = `
-                <span class="tab-title" id="title-${id}">New Tab</span>
-                <span class="tab-close" onclick="destroyTab(event, '${id}')">✕</span>
-            `;
-            tabNode.onclick = () => focusTab(id);
+            const addBtn = document.querySelector('.add-tab-btn');
+            document.getElementById('tabBar').insertBefore(tab, addBtn);
 
-            const addBtn = document.querySelector('.btn-add-tab');
-            document.getElementById('tabStrip').insertBefore(tabNode, addBtn);
+            // Create Iframe Element
+            const iframe = document.createElement('iframe');
+            iframe.id = tabId;
+            iframe.src = 'about:blank';
+            document.getElementById('iframeContainer').appendChild(iframe);
 
-            // Setup Iframe element context
-            const iframeNode = document.createElement('iframe');
-            iframeNode.id = id;
-            iframeNode.src = 'about:blank';
-            document.getElementById('viewportSpace').appendChild(iframeNode);
-
-            sessionTabs.push({ id, originalUrl: '' });
-            focusTab(id);
+            switchTab(tabId);
         }
 
-        function focusTab(id) {
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('iframe').forEach(el => el.classList.remove('active'));
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('iframe').forEach(i => i.classList.remove('active'));
 
-            const targetTab = document.getElementById(`ui-${id}`);
-            const targetIframe = document.getElementById(id);
+            const targetTab = document.getElementById(`nav-${tabId}`);
+            const targetIframe = document.getElementById(tabId);
 
             if (targetTab && targetIframe) {
                 targetTab.classList.add('active');
                 targetIframe.classList.add('active');
-                currentActiveId = id;
-
-                const tabRecord = sessionTabs.find(t => t.id === id);
-                document.getElementById('omnibox').value = tabRecord ? tabRecord.originalUrl : '';
+                activeTabId = tabId;
+                
+                // Sync address bar text
+                const currentUrl = targetIframe.dataset.originalUrl || '';
+                document.getElementById('addressBar').value = currentUrl;
             }
         }
 
-        function destroyTab(event, id) {
+        function closeTab(event, tabId) {
             event.stopPropagation();
-            document.getElementById(`ui-${id}`).remove();
-            document.getElementById(id).remove();
-            sessionTabs = sessionTabs.filter(t => t.id !== id);
+            document.getElementById(`nav-${tabId}`).remove();
+            document.getElementById(tabId).remove();
 
-            if (currentActiveId === id && sessionTabs.length > 0) {
-                focusTab(sessionTabs[sessionTabs.length - 1].id);
+            if (activeTabId === tabId) {
+                const remainingTabs = document.querySelectorAll('.tab');
+                if (remainingTabs.length > 0) {
+                    const nextTabId = remainingTabs[remainingTabs.length - 1].id.replace('nav-', '');
+                    switchTab(nextTabId);
+                }
             }
         }
 
-        function processOmniRequest(event) {
-            if (event.key === 'Enter' && currentActiveId) {
-                let targetInput = document.getElementById('omnibox').value.trim();
-                if (!targetInput) return;
+        function handleSearch(event) {
+            if (event.key === 'Enter' && activeTabId) {
+                let input = document.getElementById('addressBar').value.trim();
+                if (!input) return;
 
-                // Structure strings parsing into clean URL rules
-                if (!targetInput.startsWith('http://') && !targetInput.startsWith('https://')) {
-                    if (targetInput.includes('.') && !targetInput.includes(' ')) {
-                        targetInput = 'https://' + targetInput;
+                // Simple URL formatting
+                if (!input.startsWith('http://') && !input.startsWith('https://')) {
+                    if (input.includes('.') && !input.includes(' ')) {
+                        input = 'https://' + input;
                     } else {
-                        targetInput = 'https://google.com' + encodeURIComponent(targetInput);
+                        input = 'https://google.com' + encodeURIComponent(input);
                     }
                 }
 
-                const targetTab = sessionTabs.find(t => t.id === currentActiveId);
-                if (targetTab) targetTab.originalUrl = targetInput;
-
-                // Proxy frame loading operation pipeline via Scramjet codec proxy string resolution
-                const iframe = document.getElementById(currentActiveId);
-                const queryPath = ScramjetCodec.encode(targetInput);
-                iframe.src = `${RAILWAY_PROXY_URL}${queryPath}`;
-
-                // Update text string label on the active node
-                document.getElementById(`title-${currentActiveId}`).innerText = targetInput.replace('https://', '').replace('www.', '').split('/')[0];
+                const iframe = document.getElementById(activeTabId);
+                iframe.dataset.originalUrl = input;
+                
+                // Encode the URL using Scramjet's expected encoding logic (often XOR or Base64 depending on setup)
+                // For this example, we assume standard encoding used by the backend config
+                const encodedUrl = btoa(input); // Simplistic example; use your proxy's specific codec helper
+                iframe.src = `${PROXY_BACKEND}${encodedUrl}`;
+                
+                // Update tab title dynamically (fallback since cross-origin frames restrict title access)
+                document.getElementById(`nav-${activeTabId}`).querySelector('span').innerText = input.split('/') || input;
             }
         }
 
-        function navigateFrame(action) {
-            if (!currentActiveId) return;
+        // Initialize first tab
+        createNewTab();
+    </script>
+</body>
+</html>
