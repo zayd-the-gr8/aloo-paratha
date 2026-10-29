@@ -84,18 +84,20 @@
 
         function createNewTab() {
             tabCount++;
-            const tabId = 'tab-' + tabCount;
+            var currentId = tabCount;
+            var tabId = 'tab-' + currentId;
 
-            const tab = document.createElement('div');
+            var tab = document.createElement('div');
             tab.className = 'tab';
             tab.id = 'nav-' + tabId;
             tab.innerHTML = '<i class="material-icons-round" style="font-size: 14px; color: #9aa0a6;">public</i><span>New Tab</span><div class="close-btn" onclick="closeTab(event, \'' + tabId + '\')"><i class="material-icons-round">close</i></div>';
+            
             tab.onclick = function() { switchTab(tabId); };
             
-            const addBtn = document.querySelector('.add-tab-btn');
+            var addBtn = document.querySelector('.add-tab-btn');
             document.getElementById('tabBar').insertBefore(tab, addBtn);
 
-            const iframe = document.createElement('iframe');
+            var iframe = document.createElement('iframe');
             iframe.id = tabId;
             iframe.src = 'about:blank';
             document.getElementById('viewportContainer').appendChild(iframe);
@@ -104,18 +106,21 @@
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('iframe').forEach(function(i) { i.classList.remove('active'); });
+            var tabs = document.querySelectorAll('.tab');
+            for(var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+            
+            var iframes = document.querySelectorAll('iframe');
+            for(var j = 0; j < iframes.length; j++) { iframes[j].classList.remove('active'); }
 
-            const targetTab = document.getElementById('nav-' + tabId);
-            const targetIframe = document.getElementById(tabId);
+            var targetTab = document.getElementById('nav-' + tabId);
+            var targetIframe = document.getElementById(tabId);
 
             if (targetTab && targetIframe) {
                 targetTab.classList.add('active');
                 targetIframe.classList.add('active');
                 activeTabId = tabId;
                 
-                const currentUrl = targetIframe.dataset.originalUrl || '';
+                var currentUrl = targetIframe.getAttribute('data-url') || '';
                 document.getElementById('addressBar').value = currentUrl;
             }
         }
@@ -126,9 +131,9 @@
             document.getElementById(tabId).remove();
 
             if (activeTabId === tabId) {
-                const remainingTabs = document.querySelectorAll('.tab');
+                var remainingTabs = document.querySelectorAll('.tab');
                 if (remainingTabs.length > 0) {
-                    const nextTabId = remainingTabs[remainingTabs.length - 1].id.replace('nav-', '');
+                    var nextTabId = remainingTabs[remainingTabs.length - 1].id.replace('nav-', '');
                     switchTab(nextTabId);
                 }
             }
@@ -136,10 +141,10 @@
 
         function handleNavigation(event) {
             if (event.key === 'Enter' && activeTabId) {
-                let input = document.getElementById('addressBar').value.trim();
+                var input = document.getElementById('addressBar').value.trim();
                 if (!input) return;
 
-                let destinationUrl = input;
+                var destinationUrl = input;
                 if (!destinationUrl.startsWith('http://') && !destinationUrl.startsWith('https://')) {
                     if (destinationUrl.includes('.') && !destinationUrl.includes(' ')) {
                         destinationUrl = 'https://' + destinationUrl;
@@ -148,21 +153,21 @@
                     }
                 }
 
-                const iframe = document.getElementById(activeTabId);
-                iframe.dataset.originalUrl = input;
+                var iframe = document.getElementById(activeTabId);
+                iframe.setAttribute('data-url', input);
                 
-                // Using simple string addition (+) ensures your environment cannot break variable tracking
-                const encodedUrl = btoa(destinationUrl); 
+                // NO VARIABLES: Hardcoded full text concatenation to block accidental URL merging
+                var encodedUrl = btoa(destinationUrl); 
                 iframe.src = "https://bonto.run" + encodedUrl;
                 
-                let displayTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
+                var displayTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
                 document.getElementById('nav-' + activeTabId).querySelector('span').innerText = displayTitle;
             }
         }
 
         function triggerAction(action) {
             if (!activeTabId) return;
-            const iframe = document.getElementById(activeTabId);
+            var iframe = document.getElementById(activeTabId);
             if (action === 'refresh') iframe.src = iframe.src;
         }
 
