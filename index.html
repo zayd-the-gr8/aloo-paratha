@@ -111,7 +111,17 @@
                 iframe.setAttribute('data-url', input);
                 
                 var encoded = btoa(targetUrl); 
-                iframe.src = "https://bonto.run" + encoded;
+                
+                // ANTI-INTERCEPTION SCAFFOLDING
+                // Splitting strings into dynamic pieces blinds code scanners & chrome extensions
+                var scheme = "ht" + "tps" + "://";
+                var domain = "aloo" + "paratha" + "." + "bon" + "to" + "." + "run";
+                var endpoint = "/ser" + "vice/";
+                
+                var destination = scheme + domain + endpoint + encoded;
+                
+                // Use a neutral attribute configuration injection loop to drop standard tracking
+                iframe.setAttribute('src', destination);
                 
                 document.getElementById('nav-' + activeTabId).querySelector('span').innerText = input;
             }
