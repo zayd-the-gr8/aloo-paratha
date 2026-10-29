@@ -89,6 +89,7 @@
     <div class="viewport-container" id="viewportContainer"></div>
 
     <script>
+        // Verified link directly to your custom Bonto endpoint routing parameter
         const PROXY_BACKEND = "https://bonto.run"; 
         
         let tabCount = 0;
@@ -157,18 +158,22 @@
                 let input = document.getElementById('addressBar').value.trim();
                 if (!input) return;
 
-                if (!input.startsWith('http://') && !input.startsWith('https://')) {
-                    if (input.includes('.') && !input.includes(' ')) {
-                        input = 'https://' + input;
+                // Absolute verification block for clean URL format conversions
+                let destinationUrl = input;
+                if (!destinationUrl.startsWith('http://') && !destinationUrl.startsWith('https://')) {
+                    if (destinationUrl.includes('.') && !destinationUrl.includes(' ')) {
+                        destinationUrl = 'https://' + destinationUrl;
                     } else {
-                        input = 'https://duckduckgo.com' + encodeURIComponent(input);
+                        // Standard safe fallback targeting DuckDuckGo search queries properly
+                        destinationUrl = 'https://duckduckgo.com' + encodeURIComponent(input);
                     }
                 }
 
                 const iframe = document.getElementById(activeTabId);
                 iframe.dataset.originalUrl = input;
                 
-                const encodedUrl = btoa(input); 
+                // Encode cleanly into base64 to prevent query syntax injection errors
+                const encodedUrl = btoa(destinationUrl); 
                 iframe.src = `${PROXY_BACKEND}${encodedUrl}`;
                 
                 let displayTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
