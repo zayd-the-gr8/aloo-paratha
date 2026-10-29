@@ -89,7 +89,6 @@
     <div class="viewport-container" id="viewportContainer"></div>
 
     <script>
-        // Verified link directly to your custom Bonto endpoint routing parameter
         const PROXY_BACKEND = "https://bonto.run"; 
         
         let tabCount = 0;
@@ -158,13 +157,11 @@
                 let input = document.getElementById('addressBar').value.trim();
                 if (!input) return;
 
-                // Absolute verification block for clean URL format conversions
                 let destinationUrl = input;
                 if (!destinationUrl.startsWith('http://') && !destinationUrl.startsWith('https://')) {
                     if (destinationUrl.includes('.') && !destinationUrl.includes(' ')) {
                         destinationUrl = 'https://' + destinationUrl;
                     } else {
-                        // Standard safe fallback targeting DuckDuckGo search queries properly
                         destinationUrl = 'https://duckduckgo.com' + encodeURIComponent(input);
                     }
                 }
@@ -172,9 +169,9 @@
                 const iframe = document.getElementById(activeTabId);
                 iframe.dataset.originalUrl = input;
                 
-                // Encode cleanly into base64 to prevent query syntax injection errors
+                // Bulletproof direct string injection to replace all other variables
                 const encodedUrl = btoa(destinationUrl); 
-                iframe.src = `${PROXY_BACKEND}${encodedUrl}`;
+                iframe.src = "https://bonto.run" + encodedUrl;
                 
                 let displayTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
                 document.getElementById(`nav-${activeTabId}`).querySelector('span').innerText = displayTitle;
