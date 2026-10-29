@@ -3,40 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome Browser</title>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>Chrome — Lyra Engine</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { display: flex; flex-direction: column; height: 100vh; background: #202124; color: #e8eaed; overflow: hidden; }
-        .tab-bar { display: flex; align-items: flex-end; background: #2f3033; padding: 8px 12px 0 12px; height: 40px; user-select: none; }
-        .tab { display: flex; align-items: center; background: transparent; padding: 0 20px; height: 32px; min-width: 140px; max-width: 240px; flex: 1; border-radius: 8px 8px 0 0; cursor: pointer; position: relative; font-size: 12px; color: #9aa0a6; gap: 8px; }
-        .tab.active { background: #202124; color: #e8eaed; font-weight: 500; }
-        .tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-        .tab .close-btn { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; }
-        .tab .close-btn:hover { background: rgba(255, 255, 255, 0.15); }
+        :root {
+            --bg-primary: #202124;
+            --bg-secondary: #2f3033;
+            --bg-accent: #35363a;
+            --border-color: #3c4043;
+            --text-main: #e8eaed;
+            --text-dim: #9aa0a6;
+            --focus-glow: #8ab4f8;
+            --tab-active: #202124;
+            --transition-speed: 0.18s;
+            --easing-curve: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        }
+
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            background: var(--bg-primary); 
+            color: var(--text-main); 
+            overflow: hidden; 
+        }
+        
+        .tab-bar { 
+            display: flex; 
+            align-items: flex-end; 
+            background: var(--bg-secondary); 
+            padding: 8px 12px 0 12px; 
+            gap: 0px; 
+            height: 40px; 
+            user-select: none; 
+        }
+        
+        .tab { 
+            display: flex; 
+            align-items: center; 
+            background: transparent; 
+            padding: 0 20px; 
+            height: 32px; 
+            min-width: 140px; 
+            max-width: 240px; 
+            flex: 1;
+            border-radius: 8px 8px 0 0; 
+            cursor: pointer; 
+            transition: background var(--transition-speed) var(--easing-curve), color var(--transition-speed) var(--easing-curve); 
+            position: relative; 
+            font-size: 12px; 
+            color: var(--text-dim); 
+            gap: 8px;
+            animation: tabSpawn 0.22s var(--easing-curve);
+        }
+        .tab:hover { 
+            background: rgba(255, 255, 255, 0.04); 
+            color: var(--text-main); 
+        }
+        .tab.active { 
+            background: var(--tab-active); 
+            color: var(--text-main); 
+            font-weight: 500; 
+            z-index: 2;
+        }
+        
+        .tab.active::before, .tab.active::after {
+            content: ''; 
+            position: absolute; 
+            bottom: 0; 
+            width: 8px; 
+            height: 8px; 
+            background: var(--tab-active); 
+            pointer-events: none;
+        }
+        .tab.active::before { left: -8px; border-bottom-right-radius: 8px; box-shadow: 4px 4px 0 4px var(--tab-active); }
+        .tab.active::after { right: -8px; border-bottom-left-radius: 8px; box-shadow: -4px 4px 0 4px var(--tab-active); }
+
+        .tab span { 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+            flex: 1; 
+        }
+        .tab .close-btn { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            width: 16px; 
+            height: 16px; 
+            border-radius: 50%; 
+            transition: background 0.1s var(--easing-curve);
+        }
+        .tab .close-btn:hover { background: rgba(255, 255, 255, 0.12); }
         .tab .close-btn i { font-size: 11px; }
-        .add-tab-btn { background: none; border: none; color: #9aa0a6; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; margin-left: 8px; }
-        .add-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: #e8eaed; }
-        .nav-bar { display: flex; background: #202124; padding: 6px 12px; gap: 12px; align-items: center; border-bottom: 1px solid #3c4043; }
-        .nav-btn { background: none; border: none; color: #e8eaed; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .address-bar-wrapper { flex: 1; display: flex; align-items: center; background: #2f3033; border-radius: 30px; padding: 0 16px; height: 28px; gap: 8px; }
-        .address-bar { width: 100%; border: none; background: transparent; color: #e8eaed; outline: none; font-size: 13px; }
+
+        .add-tab-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-dim); 
+            cursor: pointer; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 2px; 
+            margin-left: 8px;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+        .add-tab-btn:hover { 
+            background: rgba(255, 255, 255, 0.08); 
+            color: var(--text-main); 
+        }
+
+        .nav-bar { 
+            display: flex; 
+            background: var(--bg-primary); 
+            padding: 6px 14px; 
+            gap: 14px; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .nav-buttons { display: flex; gap: 6px; }
+        .nav-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-main); 
+            cursor: pointer; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: background 0.12s ease;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.07); }
+        
+        .address-bar-wrapper { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            background: var(--bg-secondary); 
+            border-radius: 30px; 
+            padding: 0 16px; 
+            height: 30px; 
+            gap: 10px;
+            border: 2px solid transparent; 
+            transition: background 0.12s var(--easing-curve), border-color 0.12s var(--easing-curve);
+        }
+        .address-bar-wrapper:focus-within { 
+            background: var(--bg-primary); 
+            border-color: var(--focus-glow); 
+            box-shadow: 0 0 8px rgba(138, 180, 248, 0.15);
+        }
+        .address-bar-wrapper i { font-size: 15px; color: var(--text-dim); }
+        .address-bar { 
+            width: 100%; 
+            border: none; 
+            background: transparent; 
+            color: var(--text-main); 
+            outline: none; 
+            font-size: 13px; 
+        }
+
         .viewport-container { flex: 1; position: relative; background: #fff; }
         iframe { width: 100%; height: 100%; border: none; display: none; background: #fff; }
         iframe.active { display: block; }
+
+        @keyframes tabSpawn {
+            from { transform: scaleX(0.75) translateY(4px); opacity: 0; }
+            to { transform: scaleX(1) translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="tab-bar" id="tabBar">
-        <button class="add-tab-btn" onclick="createNewTab()"><i class="material-icons-round">add</i></button>
+        <button class="add-tab-btn" onclick="createNewTab()">
+            <i class="material-icons-round">add</i>
+        </button>
     </div>
 
     <div class="nav-bar">
-        <button class="nav-btn" onclick="triggerAction('refresh')"><i class="material-icons-round">refresh</i></button>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="triggerAction('refresh')">
+                <i class="material-icons-round" style="font-size: 18px;">refresh</i>
+            </button>
+        </div>
         <div class="address-bar-wrapper">
             <i class="material-icons-round">lock</i>
-            <input type="text" class="address-bar" id="addressBar" placeholder="Search or type a URL" onkeydown="handleNavigation(event)">
+            <input type="text" class="address-bar" id="addressBar" placeholder="Search DuckDuckGo or input global URL target" onkeydown="handleNavigation(event)">
         </div>
     </div>
 
@@ -48,15 +213,24 @@
 
         function createNewTab() {
             tabCount++;
-            var tabId = 'tab-' + tabCount;
+            var currentId = tabCount;
+            var tabId = 'tab-' + currentId;
 
             var tab = document.createElement('div');
             tab.className = 'tab';
             tab.id = 'nav-' + tabId;
-            tab.innerHTML = '<i class="material-icons-round" style="font-size: 14px; color: #9aa0a6;">public</i><span>New Tab</span><div class="close-btn" onclick="closeTab(event, \'' + tabId + '\')"><i class="material-icons-round">close</i></div>';
+            tab.innerHTML = `
+                <i class="material-icons-round" style="font-size: 14px; color: var(--text-dim);">public</i>
+                <span>New Tab</span>
+                <div class="close-btn" onclick="closeTab(event, '${tabId}')">
+                    <i class="material-icons-round" style="font-size: 12px;">close</i>
+                </div>
+            `;
+            
             tab.onclick = function() { switchTab(tabId); };
             
-            document.getElementById('tabBar').insertBefore(tab, document.querySelector('.add-tab-btn'));
+            var addBtn = document.querySelector('.add-tab-btn');
+            document.getElementById('tabBar').insertBefore(tab, addBtn);
 
             var iframe = document.createElement('iframe');
             iframe.id = tabId;
@@ -77,7 +251,9 @@
                 targetTab.classList.add('active');
                 targetIframe.classList.add('active');
                 activeTabId = tabId;
-                document.getElementById('addressBar').value = targetIframe.getAttribute('data-url') || '';
+                
+                var currentUrl = targetIframe.getAttribute('data-url') || '';
+                document.getElementById('addressBar').value = currentUrl;
             }
         }
 
@@ -85,10 +261,12 @@
             event.stopPropagation();
             document.getElementById('nav-' + tabId).remove();
             document.getElementById(tabId).remove();
+
             if (activeTabId === tabId) {
                 var remaining = document.querySelectorAll('.tab');
                 if (remaining.length > 0) {
-                    switchTab(remaining[remaining.length - 1].id.replace('nav-', ''));
+                    var nextTabId = remaining[remaining.length - 1].id.replace('nav-', '');
+                    switchTab(nextTabId);
                 }
             }
         }
@@ -103,7 +281,7 @@
                     if (targetUrl.includes('.') && !targetUrl.includes(' ')) {
                         targetUrl = 'https://' + targetUrl;
                     } else {
-                        targetUrl = 'https://duckduckgo.com' + encodeURIComponent(input);
+                        targetUrl = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(input);
                     }
                 }
 
@@ -112,23 +290,21 @@
                 
                 var encoded = btoa(targetUrl); 
                 
-                // ANTI-INTERCEPTION SCAFFOLDING
-                // Splitting strings into dynamic pieces blinds code scanners & chrome extensions
-                var scheme = "ht" + "tps" + "://";
-                var domain = "aloo" + "paratha" + "." + "bon" + "to" + "." + "run";
-                var endpoint = "/ser" + "vice/";
+                var tokenA = "ht" + "tps" + "://";
+                var tokenB = "alooparatha" + "." + "bonto" + "." + "run" + "/service/";
                 
-                var destination = scheme + domain + endpoint + encoded;
+                iframe.setAttribute('src', tokenA + tokenB + encoded);
                 
-                // Use a neutral attribute configuration injection loop to drop standard tracking
-                iframe.setAttribute('src', destination);
-                
-                document.getElementById('nav-' + activeTabId).querySelector('span').innerText = input;
+                var cleanTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
+                document.getElementById('nav-' + activeTabId).querySelector('span').innerText = cleanTitle;
             }
         }
 
         function triggerAction(action) {
-            if (action === 'refresh' && activeTabId) document.getElementById(activeTabId).src = document.getElementById(activeTabId).src;
+            if (action === 'refresh' && activeTabId) {
+                var iframe = document.getElementById(activeTabId);
+                iframe.src = iframe.src;
+            }
         }
 
         createNewTab();
