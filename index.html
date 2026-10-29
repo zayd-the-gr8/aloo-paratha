@@ -84,19 +84,13 @@
 
         function createNewTab() {
             tabCount++;
-            const tabId = `tab-${tabCount}`;
+            const tabId = 'tab-' + tabCount;
 
             const tab = document.createElement('div');
             tab.className = 'tab';
-            tab.id = `nav-${tabId}`;
-            tab.innerHTML = `
-                <i class="material-icons-round" style="font-size: 14px; color: #9aa0a6;">public</i>
-                <span>New Tab</span> 
-                <div class="close-btn" onclick="closeTab(event, '${tabId}')">
-                    <i class="material-icons-round">close</i>
-                </div>
-            `;
-            tab.onclick = () => switchTab(tabId);
+            tab.id = 'nav-' + tabId;
+            tab.innerHTML = '<i class="material-icons-round" style="font-size: 14px; color: #9aa0a6;">public</i><span>New Tab</span><div class="close-btn" onclick="closeTab(event, \'' + tabId + '\')"><i class="material-icons-round">close</i></div>';
+            tab.onclick = function() { switchTab(tabId); };
             
             const addBtn = document.querySelector('.add-tab-btn');
             document.getElementById('tabBar').insertBefore(tab, addBtn);
@@ -110,10 +104,10 @@
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('iframe').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('iframe').forEach(function(i) { i.classList.remove('active'); });
 
-            const targetTab = document.getElementById(`nav-${tabId}`);
+            const targetTab = document.getElementById('nav-' + tabId);
             const targetIframe = document.getElementById(tabId);
 
             if (targetTab && targetIframe) {
@@ -128,7 +122,7 @@
 
         function closeTab(event, tabId) {
             event.stopPropagation();
-            document.getElementById(`nav-${tabId}`).remove();
+            document.getElementById('nav-' + tabId).remove();
             document.getElementById(tabId).remove();
 
             if (activeTabId === tabId) {
@@ -157,14 +151,12 @@
                 const iframe = document.getElementById(activeTabId);
                 iframe.dataset.originalUrl = input;
                 
-                // FIXED FORCE INJECTION: Safely escapes the URL formatting parameters
+                // Using simple string addition (+) ensures your environment cannot break variable tracking
                 const encodedUrl = btoa(destinationUrl); 
-                
-                // We use templates to prevent the variable layout from squishing strings
-                iframe.src = `https://bonto.run{encodedUrl}`;
+                iframe.src = "https://bonto.run" + encodedUrl;
                 
                 let displayTitle = input.replace('https://', '').replace('http://', '').replace('www.', '');
-                document.getElementById(`nav-${activeTabId}`).querySelector('span').innerText = displayTitle;
+                document.getElementById('nav-' + activeTabId).querySelector('span').innerText = displayTitle;
             }
         }
 
